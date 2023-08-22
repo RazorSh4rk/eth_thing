@@ -1,14 +1,13 @@
 package storage
 
 import (
-	eth "eth_tracker/ETH"
+	"eth_tracker/eth"
 	"fmt"
 	"strconv"
 	"time"
 )
 
-// querying every 2 seconds, if i have time i want to get the difference
-// between the 2 timestamps and sleep for like half of that
+// querying every 2 seconds
 func QueryTimestamp() {
 	for {
 		latestBlock := eth.GetLatestBlock()
@@ -19,7 +18,7 @@ func QueryTimestamp() {
 		if parseTimestamp(latestTime) > parseTimestamp(storedTime) {
 			Set("time_updated", latestTime)
 			Set("latest_block", latestBlockNum)
-			fmt.Println(latestTime)
+			fmt.Println("Updating timestamp to ", latestTime)
 
 			// check transactions if we have a new block
 			queryTransactions()
@@ -35,22 +34,32 @@ func QueryTimestamp() {
 // i will not do this rn, but would definitely do it for prod
 func queryTransactions() {
 	all_transactions := eth.GetLatestBlock().Result.Transactions
+	fmt.Println("Queried transactions: ", len(all_transactions))
+
+	watched := GetWatchedAddresses()
+	fmt.Println("Watched addresses: ", len(watched))
+
 	for _, hash := range all_transactions {
 		transaction := eth.GetTransactionByHash(hash)
-		watched := GetWatchedAddresses()
 
 		for _, addr := range watched {
 			if transaction.Result.From == addr || transaction.Result.To == addr {
-				StoreTransaction(addr, transaction.Result.Hash)
+				fmt.Println("New transaction for ", addr)
+				StoreTransaction(addr, transaction)
 			}
 		}
 	}
 }
 
 func parseTimestamp(timestamp string) uint64 {
+	// sometimes the http request fails
+	// to return so i just skip an iteration
+	if timestamp == "" {
+		timestamp = Get("time_updated")
+	}
 	unix_time, err := strconv.ParseUint(timestamp, 0, 64)
 	if err != nil {
-		panic("Unix time conversion failed with " + err.Error())
+		panic("Unix time conversion failed with " + err.Error() + " timestamp: " + timestamp)
 	}
 	return unix_time
 }

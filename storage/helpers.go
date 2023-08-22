@@ -1,31 +1,35 @@
 package storage
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"eth_tracker/eth"
+)
 
 // add another address to watch
-func StoreWatchedAddress(address string) {
+func StoreWatchedAddress(address string) bool {
 	addresses := Get("watched_addresses")
 
 	var arr []string
 	err := json.Unmarshal([]byte(addresses), &arr)
 	if err != nil {
-		panic("Error while deserializing stored addresses")
+		return false
 	}
 
 	arr = append(arr, addresses)
 
 	modified, err := json.Marshal(arr)
 	if err != nil {
-		panic("Error while serializing stored addresses")
+		return false
 	}
 
 	Set("watched_addresses", string(modified))
+	return true
 }
 
-func StoreTransaction(addr string, trans string) {
+func StoreTransaction(addr string, trans eth.EthereumTransaction) {
 	transactions := Get(addr)
 
-	var arr []string
+	var arr []eth.EthereumTransaction
 	err := json.Unmarshal([]byte(transactions), &arr)
 	if err != nil {
 		panic("Error while deserializing stored transactions")

@@ -21,6 +21,7 @@ type EthereumBlock struct {
 	} `json:"result"`
 }
 
+// same here
 type EthereumTransaction struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Result  struct {
