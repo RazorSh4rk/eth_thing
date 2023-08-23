@@ -31,8 +31,9 @@ type EthereumTransaction struct {
 	} `json:"result"`
 }
 
+var url string = "https://cloudflare-eth.com/"
+
 func GetLatestBlock() (ethBlock EthereumBlock) {
-	url := "https://cloudflare-eth.com/"
 	payload := []byte(`{
 		"jsonrpc": "2.0",
 		"method": "eth_getBlockByNumber",
@@ -66,12 +67,11 @@ func GetLatestBlock() (ethBlock EthereumBlock) {
 }
 
 func GetTransactionByHash(hash string) (ethTrans EthereumTransaction) {
-	url := "https://cloudflare-eth.com/"
 	raw := `{
 		"jsonrpc": "2.0",
 		"method": "eth_getTransactionByHash",
 		"params": [
-			%s
+			"%s"
 		],
 		"id": 1
 	}`

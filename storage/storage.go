@@ -1,4 +1,4 @@
-// Something simimlar to a traditional KV store
+// Something similar to a traditional KV store
 // such as redis, so the backend can be swapped
 // to something managed.
 
