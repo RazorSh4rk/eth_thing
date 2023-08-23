@@ -15,7 +15,7 @@ func StoreWatchedAddress(address string) bool {
 		return false
 	}
 
-	arr = append(arr, addresses)
+	arr = append(arr, address)
 
 	modified, err := json.Marshal(arr)
 	if err != nil {

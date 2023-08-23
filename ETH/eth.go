@@ -59,7 +59,7 @@ func GetLatestBlock() (ethBlock EthereumBlock) {
 
 	err = json.NewDecoder(resp.Body).Decode(&ethBlock)
 	if err != nil {
-		fmt.Println("Error decoding response:", err)
+		fmt.Println("ETH: Error decoding response:", err, resp.Body)
 		return
 	}
 
@@ -87,7 +87,7 @@ func GetTransactionByHash(hash string) (ethTrans EthereumTransaction) {
 
 	err = json.NewDecoder(resp.Body).Decode(&ethTrans)
 	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
+		fmt.Println("ETH: Error decoding JSON:", err, resp.Body)
 		return
 	}
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Address Monitoring</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Address Monitoring</h1>
+    <input type="text" id="addressInput" placeholder="Enter address">
+    <button onclick="subscribe()">Subscribe</button>
+    
+    <h2>Addresses Table</h2>
+    <table id="addressesTable">
+        <tr>
+            <th>Address</th>
+        </tr>
+    </table>
+    
+    <h2>Transactions Table</h2>
+    <table id="transactionsTable">
+        <tr>
+            <th>From</th>
+            <th>To</th>
+        </tr>
+    </table>
+
+    <script>
+        const addressesTable = document.getElementById("addressesTable");
+        const transactionsTable = document.getElementById("transactionsTable");
+
+        const subscribeURL = "http://localhost:8080/subscribe";
+        const addressesURL = "http://localhost:8080/subs";
+        const transactionsURL = "http://localhost:8080/transactions";
+
+        function subscribe() {
+            const input = document.getElementById("addressInput").value;
+            fetch(`${subscribeURL}?address=${input}`)
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+        }
+
+        function updateAddressesTable(addresses) {
+            addressesTable.innerHTML = "<tr><th>Address</th></tr>";
+            addresses.forEach(address => {
+                const row = addressesTable.insertRow(-1);
+                const cell = row.insertCell(0);
+                cell.innerHTML = address;
+            });
+        }
+
+        function updateTransactionsTable(transactions) {
+            transactionsTable.innerHTML = "<tr><th>From</th><th>To</th></tr>";
+            transactions.forEach(transaction => {
+                const row = transactionsTable.insertRow(-1);
+                const fromCell = row.insertCell(0);
+                const toCell = row.insertCell(1);
+                fromCell.innerHTML = transaction.from;
+                toCell.innerHTML = transaction.to;
+            });
+        }
+
+        function fetchAddresses() {
+            fetch(addressesURL)
+                .then(response => response.json())
+                .then(data => updateAddressesTable(data))
+                .catch(error => console.error(error));
+        }
+
+        function fetchTransactions(address) {
+            fetch(`${transactionsURL}?address=${address}`)
+                .then(response => response.json())
+                .then(data => { if(data.transactions != null) updateTransactionsTable(data) })
+                .catch(error => console.error(error));
+        }
+
+        fetchAddresses();
+        setInterval(fetchAddresses, 5000);
+
+        setInterval(() => {
+            const addresses = addressesTable.querySelectorAll('td');
+            addresses.forEach(addressCell => {
+                const address = addressCell.textContent;
+                fetchTransactions(address);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

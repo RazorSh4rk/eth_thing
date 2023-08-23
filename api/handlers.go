@@ -16,8 +16,15 @@ type TransactionsResponse struct {
 	Transactions []eth.EthereumTransaction `json:"transactions"`
 }
 
+func setHeaders(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+}
+
 func HandleGetCurrentBlock(parser *Parser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		setHeaders(w)
 		block := parser.GetCurrentBlock()
 
 		response := BlockResponse{Id: block}
@@ -35,6 +42,7 @@ func HandleGetCurrentBlock(parser *Parser) http.HandlerFunc {
 
 func HandleSubscribe(parser *Parser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		setHeaders(w)
 		queryParams := r.URL.Query()
 		address := queryParams.Get("address")
 
@@ -55,6 +63,7 @@ func HandleSubscribe(parser *Parser) http.HandlerFunc {
 
 func HandleGetTransactions(parser *Parser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		setHeaders(w)
 		queryParams := r.URL.Query()
 		address := queryParams.Get("address")
 
@@ -78,6 +87,7 @@ func HandleGetTransactions(parser *Parser) http.HandlerFunc {
 }
 
 func HandleAllSubs(w http.ResponseWriter, r *http.Request) {
+	setHeaders(w)
 	addr := storage.GetWatchedAddresses()
 	jsonRes, err := json.Marshal(addr)
 

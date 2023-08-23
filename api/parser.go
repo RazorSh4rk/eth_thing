@@ -30,11 +30,12 @@ func (parser *Parser) Subscribe(address string) bool {
 
 func (parser *Parser) GetTransactions(address string) (ethTrans []eth.EthereumTransaction) {
 	data := storage.Get(address)
-
-	err := json.Unmarshal([]byte(data), &ethTrans)
-	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
-		return nil
+	if data != "" {
+		err := json.Unmarshal([]byte(data), &ethTrans)
+		if err != nil {
+			fmt.Println("Parser: Error decoding JSON:", err, data)
+			return nil
+		}
 	}
 
 	return
